@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 class Go1Cfg( LeggedRobotCfg ):
-    task_name = 'go1'
+    task_name = 'go1' # go1_forward
     class init_state( LeggedRobotCfg.init_state ):
         pos = [0.0, 0.0, 0.32] # x,y,z [m]
         rel_foot_pos = [[0.1881,0.1881,-0.1881,-0.1881], # x

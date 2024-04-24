@@ -262,7 +262,7 @@ class LeggedRobot(BaseTask):
         
         idx = self.mid_air * ~self.has_jumped * self.was_in_flight
         # idx = torch.logical_and(self.mid_air,~self.has_jumped)
-        self.max_height[idx] = torch.max(self.max_height[idx],self.root_states[idx, 2]) # update max height achieved
+        self.max_height[idx] = torch.max(self.max_height[idx],self.root_states[idx, 2]) # update max height robot can achieved so far
         
         self.min_height[~self.has_jumped] = torch.min(self.min_height[~self.has_jumped], self.root_states[~self.has_jumped, 2]) # update min height achieved
 
@@ -341,6 +341,7 @@ class LeggedRobot(BaseTask):
         # Handle starting in mid-air (initialise in air):
         settled_after_init = torch.logical_and(torch.all(contact_filt,dim=1), self.root_states[:,2]<=0.4)
         jump_filter = torch.all(~contact_filt, dim=1)#torch.logical_and(torch.all(~contact_filt, dim=1),self.root_states[:,2]>0.32) # If no contact for all 4 feet, jump is true
+        # torch.all() output True only if all are true. torch.any() output flase only if all are false.
         # jump_filter = torch.sum(contact_filt, dim=1) <= 2 # If more than  foot is in the air, jump has started
 
         self.mid_air = jump_filter.clone()
@@ -2388,7 +2389,7 @@ class LeggedRobot(BaseTask):
         self.num_dofs = len(self.dof_names) #
         feet_names = [s for s in body_names if self.cfg.asset.foot_name in s]
         penalized_contact_names = []
-        for name in self.cfg.asset.penalize_contacts_on:
+        for name in self.cfg.asset.penalize_contacts_on: # thigh, calf
             penalized_contact_names.extend([s for s in body_names if name in s])
         termination_contact_names = []
         for name in self.cfg.asset.terminate_after_contacts_on:
@@ -2676,13 +2677,13 @@ class LeggedRobot(BaseTask):
         rel_root_states = self.landing_poses[:,:2] - self.initial_root_states[:,:2]
 
         tracking_error = torch.zeros(self.num_envs, device=self.device, requires_grad=False)
-        tracking_error = torch.linalg.norm(rel_root_states[:] - self.commands[:, :2],dim=1)
+        tracking_error = torch.linalg.norm(rel_root_states[:] - self.commands[:, :2],dim=1) # push the robot to approach the desired panding position
         # Check which envs have actually jumped (and not just been initialised at an already "jumped" state)
         has_jumped_idx = torch.logical_and(self.has_jumped,~self._has_jumped_rand_envs)
 
-        max_tracking_error = self.cfg.env.reset_landing_error #(self.cfg.env.reset_landing_error * (self.commands[:,:2])).clip(min=0.1)
+        max_tracking_error = self.cfg.env.reset_landing_error #0.2 #(self.cfg.env.reset_landing_error * (self.commands[:,:2])).clip(min=0.1)
 
-        self.reset_idx_landing_error[torch.logical_and(has_jumped_idx,tracking_error>max_tracking_error)] = True
+        self.reset_idx_landing_error[torch.logical_and(has_jumped_idx, tracking_error>max_tracking_error)] = True
         
 
         self.tracking_error_store[has_jumped_idx] = tracking_error[has_jumped_idx]
@@ -2715,7 +2716,7 @@ class LeggedRobot(BaseTask):
         _,_,yaw_landing = get_euler_xyz(self.landing_poses[:, 3:7])
         _,_,yaw_des = get_euler_xyz(self.commands[:, 3:7])
 
-        ori_tracking_error_yaw = torch.abs(wrap_to_pi(yaw_landing-yaw_des))
+        ori_tracking_error_yaw = torch.abs(wrap_to_pi(yaw_landing-yaw_des)) # minimize the error towards desired value.
 
         # Check which envs have actually jumped (and not just been initialised at an already "jumped" state)
         has_jumped_idx = torch.logical_and(self.has_jumped,~self._has_jumped_rand_envs)
@@ -2787,7 +2788,7 @@ class LeggedRobot(BaseTask):
         return rew
      
     
-    def _reward_task_max_height(self):
+    def _reward_task_max_height(self): # maybe useful
         # Reward for max height achieved during the episode:
         env_ids = torch.logical_and(self.episode_length_buf == self.max_episode_length,self.has_jumped)
 
@@ -2797,7 +2798,7 @@ class LeggedRobot(BaseTask):
             return rew
     
 
-        max_height_reward = (self.max_height[env_ids] - 0.9)
+        max_height_reward = (self.max_height[env_ids] - 0.9) # encourage the max_height to approach 0.9
 
         rew[env_ids] = torch.exp(-torch.square(max_height_reward)/self.cfg.rewards.max_height_reward_sigma)
 
@@ -2847,9 +2848,9 @@ class LeggedRobot(BaseTask):
         feet_pos_des = feet_pos_ini.clone()
 
         # In mid-air and above 0.45m height, track close to body (otheriwse track normal):
-        feet_pos_des[:,:,2 ]= -0.15
-
-        feet_error = torch.linalg.norm(feet_body_frame - feet_pos_des,dim=-1)
+        feet_pos_des[:,:,2 ]= -0.15 # this is the deisred foot position
+ 
+        feet_error = torch.linalg.norm(feet_body_frame - feet_pos_des,dim=-1) # let foot pos in body frame closed to the desired foot position
         
         
         rew = torch.sum(torch.square(feet_error),dim=-1)
@@ -2863,7 +2864,7 @@ class LeggedRobot(BaseTask):
         return rew
     
 
-    def _reward_base_height_flight(self):
+    def _reward_base_height_flight(self):  # maybe useful
         # Reward flight height
         rew = torch.zeros(self.num_envs, device=self.device, requires_grad=False)
 
@@ -2875,9 +2876,7 @@ class LeggedRobot(BaseTask):
 
         rew[self.mid_air] = torch.exp(-torch.square(base_height_flight)/self.cfg.rewards.flight_reward_sigma)
 
-        rew[self.has_jumped + ~self.mid_air] = 0.
-
-
+        rew[self.has_jumped + ~self.mid_air] = 0. # True + False = True
 
         return rew 
     

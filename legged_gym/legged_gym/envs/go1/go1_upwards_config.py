@@ -9,7 +9,7 @@ class Go1UpwardsCfg( LeggedRobotCfg ):
         pos = [0.0, 0.0, 0.32] # x,y,z [m]
         rel_foot_pos = [[0.1881,0.1881,-0.1881,-0.1881], # x
                         [0.12675,-0.12675,0.12675,-0.12675], # y
-                        [-0.32,-0.32,-0.32,-0.32]] # z
+                        [-0.32,-0.32,-0.32,-0.32]] # z  # relative to the COM pos
         
         rot = [0.0, 0.0, 0.0, 1.0] # x,y,z,w [quat]
         lin_vel = [0.0, 0.0, 0.0]  # x,y,z [m/s]
