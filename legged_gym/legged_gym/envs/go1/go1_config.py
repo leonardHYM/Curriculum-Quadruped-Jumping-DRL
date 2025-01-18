@@ -5,7 +5,10 @@ import torch
 
 class Go1Cfg( LeggedRobotCfg ):
     task_name = 'go1' # go1_forward
+<<<<<<< HEAD
     additional_termination_conditions = True
+=======
+>>>>>>> c5d6d8a72ba4c3aa64ce552eeda026d7114b5977
     class init_state( LeggedRobotCfg.init_state ):
         pos = [0.0, 0.0, 0.32] # x,y,z [m]
         rel_foot_pos = [[0.1881,0.1881,-0.1881,-0.1881], # x

@@ -2803,7 +2803,11 @@ class LeggedRobot(BaseTask):
         rel_root_states = self.landing_poses[:,:2] - self.initial_root_states[:,:2]
 
         tracking_error = torch.zeros(self.num_envs, device=self.device, requires_grad=False)
+<<<<<<< HEAD
         tracking_error = torch.linalg.norm(rel_root_states[:] - self.commands[:, :2],dim=1) # push the robot to approach the desired landing position
+=======
+        tracking_error = torch.linalg.norm(rel_root_states[:] - self.commands[:, :2],dim=1) # push the robot to approach the desired panding position
+>>>>>>> c5d6d8a72ba4c3aa64ce552eeda026d7114b5977
         # Check which envs have actually jumped (and not just been initialised at an already "jumped" state)
         has_jumped_idx = torch.logical_and(self.has_jumped,~self._has_jumped_rand_envs)
 
@@ -2925,7 +2929,11 @@ class LeggedRobot(BaseTask):
             return rew
     
 
+<<<<<<< HEAD
         max_height_reward = (self.max_height[env_ids] - 0.8) # encourage the max_height to approach 0.9
+=======
+        max_height_reward = (self.max_height[env_ids] - 0.9) # encourage the max_height to approach 0.9
+>>>>>>> c5d6d8a72ba4c3aa64ce552eeda026d7114b5977
 
         rew[env_ids] = torch.exp(-torch.square(max_height_reward)/self.cfg.rewards.max_height_reward_sigma)
 
@@ -2975,7 +2983,11 @@ class LeggedRobot(BaseTask):
         feet_pos_des = feet_pos_ini.clone()
 
         # In mid-air and above 0.45m height, track close to body (otheriwse track normal):
+<<<<<<< HEAD
         feet_pos_des[:, :, 2]= -0.16 # this is the deisred foot position
+=======
+        feet_pos_des[:,:,2 ]= -0.15 # this is the deisred foot position
+>>>>>>> c5d6d8a72ba4c3aa64ce552eeda026d7114b5977
  
         feet_error = torch.linalg.norm(feet_body_frame - feet_pos_des,dim=-1) # let foot pos in body frame closed to the desired foot position
         
@@ -3006,7 +3018,11 @@ class LeggedRobot(BaseTask):
 
         rew[self.has_jumped + ~self.mid_air] = 0. # True + False = True
 
+<<<<<<< HEAD
         return rew  #
+=======
+        return rew 
+>>>>>>> c5d6d8a72ba4c3aa64ce552eeda026d7114b5977
     
     def _reward_base_height_stance(self):
         # Reward feet height

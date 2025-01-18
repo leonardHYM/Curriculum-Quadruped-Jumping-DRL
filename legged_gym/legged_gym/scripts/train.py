@@ -52,7 +52,11 @@ def train(args):
 
     mode = "online"
 
+<<<<<<< HEAD
     wandb.init(project="", name=run_name,  entity="ymhan2024", mode=mode, dir="../../logs",tags=["task_" + args.task,env.cfg.task_name]) #task_name=go1
+=======
+    wandb.init(project="", name=run_name,  group=args.group_name, mode=mode, dir="../../logs",tags=["task_" + args.task,env.cfg.task_name])
+>>>>>>> c5d6d8a72ba4c3aa64ce552eeda026d7114b5977
 
 
     ppo_runner.learn(num_learning_iterations=train_cfg.runner.max_iterations, init_at_random_ep_len=True)

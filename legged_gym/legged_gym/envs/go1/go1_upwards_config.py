@@ -7,11 +7,19 @@ class Go1UpwardsCfg( LeggedRobotCfg ):
     additional_termination_conditions = True
     task_name = 'go1_upwards'
     class init_state( LeggedRobotCfg.init_state ):
+<<<<<<< HEAD
         pos = [0.0, 0.0, 0.33] # x,y,z [m]
         rel_foot_pos = [[0.194,0.194,-0.193,-0.193], # x
                         [0.156,-0.156,0.156,-0.156], # y
                         [-0.316,-0.316,-0.316,-0.316]]  # z feet pos  # relative to the COM pos #Initial value is -0.169
         # this rel_foot_pos is respective to the default joint angles.
+=======
+        pos = [0.0, 0.0, 0.32] # x,y,z [m]
+        rel_foot_pos = [[0.1881,0.1881,-0.1881,-0.1881], # x
+                        [0.12675,-0.12675,0.12675,-0.12675], # y
+                        [-0.32,-0.32,-0.32,-0.32]] # z  # relative to the COM pos
+        
+>>>>>>> c5d6d8a72ba4c3aa64ce552eeda026d7114b5977
         rot = [0.0, 0.0, 0.0, 1.0] # x,y,z,w [quat]
         lin_vel = [0.0, 0.0, 0.0]  # x,y,z [m/s]
         ang_vel = [0.0, 0.0, 0.0]  # x,y,z [rad/s]
