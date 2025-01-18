@@ -138,8 +138,11 @@ class TaskRegistry():
         if log_root=="default":
             log_root = os.path.join(LEGGED_GYM_ROOT_DIR, 'logs', train_cfg.runner.experiment_name)
             log_dir = os.path.join(log_root, datetime.now().strftime('%b%d_%H-%M-%S') + '_' + train_cfg.runner.run_name)
+            print('log_root is:', log_root)
+            print('log_dir is:', log_dir)
         elif log_root is None:
             log_dir = None
+            #print("log_dir is None")
         else:
             log_dir = os.path.join(log_root, datetime.now().strftime('%b%d_%H-%M-%S') + '_' + train_cfg.runner.run_name)
         

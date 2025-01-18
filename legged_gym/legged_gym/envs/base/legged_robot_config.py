@@ -94,7 +94,7 @@ class LeggedRobotCfg(BaseConfig):
             "joint_a": 0., 
             "joint_b": 0.}
 
-    class control:
+    class control: # control the property of joint
         control_type = 'P' # P: position, V: velocity, T: torques
         # PD Drive parameters:
         stiffness = {'joint_a': 10.0, 'joint_b': 15.}  # [N*m/rad]
@@ -106,7 +106,7 @@ class LeggedRobotCfg(BaseConfig):
 
     class asset:
         file = ""
-        name = "legged_robot"  # actor name
+        #name = "legged_robot"  # actor name
         foot_name = "None" # name of the feet bodies, used to index body state and contact force tensors
         penalize_contacts_on = []
         terminate_after_contacts_on = []
@@ -116,7 +116,7 @@ class LeggedRobotCfg(BaseConfig):
         default_dof_drive_mode = 3 # see GymDofDriveModeFlags (0 is none, 1 is pos tgt, 2 is vel tgt, 3 effort)
         self_collisions = 0 # 1 to disable, 0 to enable...bitwise filter
         replace_cylinder_with_capsule = True # replace collision cylinders with capsules, leads to faster/more stable simulation
-        flip_visual_attachments = True # Some .obj meshes must be flipped from y-up to z-up
+        flip_visual_attachments = False#True # Some .obj meshes must be flipped from y-up to z-up
         
         density = 0.001
         angular_damping = 0.
@@ -217,7 +217,7 @@ class LeggedRobotCfg(BaseConfig):
     class sim:
         dt =  0.005
         substeps = 1
-        gravity = [0., 0. ,-9.81]  # [m/s^2]
+        gravity = [0.,0. , -9.81]  # [m/s^2]
         up_axis = 1  # 0 is y, 1 is z
 
         class physx:
@@ -269,7 +269,7 @@ class LeggedRobotCfgPPO(BaseConfig):
         max_iterations = 1500 # number of policy updates
 
         # logging
-        save_interval = 50 # check for potential saves every this many iterations
+        save_interval = 100#50 # check for potential saves every this many iterations
         experiment_name = 'test'
         run_name = ''
         # load and resume

@@ -105,7 +105,8 @@ def parse_sim_params(args, cfg):
 def get_load_path(root, load_run=-1, checkpoint=-1):
     try:
         runs = os.listdir(root)
-        runs = sorted(runs, key=lambda day: datetime.strptime(day, "%b%d_%H-%M-%S_"))
+    # print("runs is:", runs)
+        #runs = sorted(runs, key=lambda day: datetime.strptime(day, "%b%d_%H-%M-%S_"))
         if 'exported' in runs: runs.remove('exported')
         last_run = os.path.join(root, runs[-1])
     except:

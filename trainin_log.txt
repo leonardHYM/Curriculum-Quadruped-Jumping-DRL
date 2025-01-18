@@ -1,0 +1,6 @@
+2024.4.24: training aliengo config with the same go1 config randomization settings.
+
+2024.05.29: training aliengo upwards without base height stance reward.(0529_11_56) ---> cannot jump
+2024.05.29_11_56: training with new paras in base_height_stance reward and additional_termination_conditions as False----> cannot jump at all
+2024.05.29_16_05: delete large_feet_contact_force reward and add the regulation gesture rewards. ----> cannot jump
+2024.05.29_16_26: allow has_jumped id at first. and larger base_height_flight and jumping reward.

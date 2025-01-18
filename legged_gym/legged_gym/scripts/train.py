@@ -47,14 +47,13 @@ def train(args):
     ppo_runner, train_cfg = task_registry.make_alg_runner(env=env, name=args.task, args=args)
     
 
-    log_root = os.path.join(LEGGED_GYM_ROOT_DIR, 'logs', train_cfg.runner.experiment_name)
+    log_root = os.path.join(LEGGED_GYM_ROOT_DIR, 'logs', train_cfg.runner.experiment_name) # experiemnt_name = test_go1
     run_name = os.path.join(log_root, datetime.now().strftime('%b%d_%H-%M-%S') + '_')
 
     mode = "online"
 
-    wandb.init(project="RlJumpingAblationStudy", name=run_name,  group=args.group_name, mode=mode, dir="../../logs",tags=["task_" + args.task,env.cfg.task_name])
-    wandb.save(LEGGED_GYM_ENVS_DIR + "/go1/go1_config.py", policy="now")
-    wandb.save(LEGGED_GYM_ENVS_DIR + "/base/legged_robot.py", policy="now")
+    wandb.init(project="", name=run_name,  entity="ymhan2024", mode=mode, dir="../../logs",tags=["task_" + args.task,env.cfg.task_name]) #task_name=go1
+
 
     ppo_runner.learn(num_learning_iterations=train_cfg.runner.max_iterations, init_at_random_ep_len=True)
 

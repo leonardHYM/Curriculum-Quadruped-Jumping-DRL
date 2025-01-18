@@ -4,22 +4,23 @@ import numpy as np
 import torch
 
 class Go1UpwardsCfg( LeggedRobotCfg ):
+    additional_termination_conditions = True
     task_name = 'go1_upwards'
     class init_state( LeggedRobotCfg.init_state ):
-        pos = [0.0, 0.0, 0.32] # x,y,z [m]
-        rel_foot_pos = [[0.1881,0.1881,-0.1881,-0.1881], # x
-                        [0.12675,-0.12675,0.12675,-0.12675], # y
-                        [-0.32,-0.32,-0.32,-0.32]] # z
-        
+        pos = [0.0, 0.0, 0.33] # x,y,z [m]
+        rel_foot_pos = [[0.194,0.194,-0.193,-0.193], # x
+                        [0.156,-0.156,0.156,-0.156], # y
+                        [-0.316,-0.316,-0.316,-0.316]]  # z feet pos  # relative to the COM pos #Initial value is -0.169
+        # this rel_foot_pos is respective to the default joint angles.
         rot = [0.0, 0.0, 0.0, 1.0] # x,y,z,w [quat]
         lin_vel = [0.0, 0.0, 0.0]  # x,y,z [m/s]
         ang_vel = [0.0, 0.0, 0.0]  # x,y,z [rad/s]
         default_joint_angles = { # = target angles [rad] when action = 0.0
 
-            'FL_hip_joint': 0.0,   # [rad]
-            'RL_hip_joint': 0.0,   # [rad]
-            'FR_hip_joint': -0.0 ,  # [rad]
-            'RR_hip_joint': -0.0,   # [rad]
+            'FL_hip_joint': 0.04,   # [rad]
+            'RL_hip_joint': 0.04,   # [rad]
+            'FR_hip_joint': -0.04,  # [rad]
+            'RR_hip_joint': -0.04,   # [rad]
 
             'FL_thigh_joint': 0.7220,     # [rad]
             'RL_thigh_joint': 0.7220,   # [rad]
@@ -156,13 +157,13 @@ class Go1UpwardsCfg( LeggedRobotCfg ):
         terminate_after_contacts_on = ["base","thigh", "calf","hip"]
         collapse_fixed_joints = True # merge bodies connected by fixed joints. Specific fixed joints can be kept by adding " <... dont_collapse="true">
         self_collisions = 0 # 1 to disable, 0 to enable...bitwise filter
-        flip_visual_attachments = False
+        flip_visual_attachments = True#False # go1 must be false
         fix_base_link = False
 
         armature = 0.0
         use_physx_armature = False
   
-    class domain_rand ( LeggedRobotCfg.domain_rand ):
+    class domain_rand ( LeggedRobotCfg.domain_rand ): # modified Reference State Initialization(RSI)
         push_robots = True
         push_interval_s = 1.
         max_push_vel_xy = 1.
@@ -173,8 +174,8 @@ class Go1UpwardsCfg( LeggedRobotCfg ):
         push_upwards = False
         push_upwards_prob = 0.5
         
-        randomize_robot_pos = True
-        randomize_robot_vel = True
+        randomize_robot_pos = True #
+        randomize_robot_vel = True #
         randomize_robot_ori = True
         randomize_dof_pos = True
         randomize_spring_params = True
@@ -267,12 +268,13 @@ class Go1UpwardsCfg( LeggedRobotCfg ):
             #---------- Task rewards (once per episode): ----------- #
 
             # Rewards for reaching desired pose upon landing:
+            # only rewwards when self.episode_length_buf == self.max_episode_length.
             task_pos = 200.0 # Final reward is scale * (dt*decimation)
             task_ori = 200.0
             task_max_height = 2000.0 # Reward for maximum height (minus minimum height) achieved
             
             termination = -20.
-            jumping = 50.
+            jumping = 100.#50.
 
             #---------- Continuous rewards (at every time step): ----------- #
 
@@ -341,7 +343,7 @@ class Go1UpwardsCfg( LeggedRobotCfg ):
 
     class commands():
         jump_over_box = False
-        num_commands = 13 # default: relative x,y,z for jump and desired quaternion (euler angles use xyz notation)
+        num_commands = 13  # default: relative x,y,z for jump and desired quaternion (euler angles use xyz notation)
         # and 6 for centre of object and its dimensions.
         upward_jump_probability = 0.1
         curriculum = False
@@ -353,23 +355,23 @@ class Go1UpwardsCfg( LeggedRobotCfg ):
         num_levels = 11
         randomize_yaw = False
         
-        class ranges(): 
+        class ranges(): # command disturbance. Means the jumping distance range to track
             # The command distances are relative to the initial agent position and are sampled from
             # the ranges below:
 
             # This is the min/maximum ranges in the jump's distance curriculum (x_des = dx~pos_dx + x)
-            pos_dx_lim = [-0.0,0.0]
+            pos_dx_lim = [-0.0,0.0] #pos_command_variation_limits
             pos_dy_lim = [-0.0,0.0]
             pos_dz_lim = [-0.0,0.0]
             # These are the starting ranges for the jump's distances (i.e. if curriculum 
             # if off, these stay the same for the whole training.)
-            pos_dx_ini = [0.0,0.0]
+            pos_dx_ini = [0.0,0.0]  # pos_command_variation_ini
             pos_dy_ini = [-0.0,0.0]
             pos_dz_ini = [0.0,0.0]
             # These are the steps for the jump distance changes every curriculum update.
             pos_variation_increment = [0.01,0.01,0.01]
 
-        class distances(): # If you want to pass a fixed command distance, use these values:
+        class distances(): # Command distance to track. If you want to pass a fixed command distance, use these values:
             x = 0.0
             y = 0.0
             z = 0.0
@@ -437,5 +439,5 @@ class Go1UpwardsCfgPPO( LeggedRobotCfgPPO ):
         # policy_class_name = 'ActorCriticRecurrent'
         # policy_class_name = 'ActorCritic'
         run_name = ''
-        experiment_name = 'test_go1'
+        experiment_name = 'go1_upwards' # for saving and loading training results, which is subject to personal design.
         num_steps_per_env = 24 # Try 30?

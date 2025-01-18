@@ -91,8 +91,8 @@ class OnPolicyRunner:
         if init_at_random_ep_len:
             self.env.episode_length_buf = torch.randint_like(self.env.episode_length_buf, high=int(self.env.max_episode_length))
         obs = self.env.get_observations()
-        privileged_obs = self.env.get_privileged_observations()
-        critic_obs = privileged_obs if privileged_obs is not None else obs
+        privileged_obs = self.env.get_privileged_observations() #function return self.privileged_obs_buf
+        critic_obs = privileged_obs if privileged_obs is not None else obs #here is where to get the observation of critic network.
         obs, critic_obs = obs.to(self.device), critic_obs.to(self.device)
         self.alg.actor_critic.train() # switch to train mode (for dropout for example)
 
@@ -146,7 +146,7 @@ class OnPolicyRunner:
                 self.log(locals())
             if it % self.save_interval == 0:
                 self.save(os.path.join(self.log_dir, 'model_{}.pt'.format(it)))
-                
+                print('begin saving model')
             # Every 500 iterations, update current_learning_iteration for retraining
             if it % 500 == 0:
                 self.current_learning_iteration = it

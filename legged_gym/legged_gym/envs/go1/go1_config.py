@@ -4,7 +4,8 @@ import numpy as np
 import torch
 
 class Go1Cfg( LeggedRobotCfg ):
-    task_name = 'go1'
+    task_name = 'go1' # go1_forward
+    additional_termination_conditions = True
     class init_state( LeggedRobotCfg.init_state ):
         pos = [0.0, 0.0, 0.32] # x,y,z [m]
         rel_foot_pos = [[0.1881,0.1881,-0.1881,-0.1881], # x
@@ -151,14 +152,14 @@ class Go1Cfg( LeggedRobotCfg ):
         safety_clip_actions = True # Clip ALL actions whenever ANY joint approaches its limit.
 
     class asset( LeggedRobotCfg.asset ):
-        file = '{LEGGED_GYM_ROOT_DIR}/resources/robots/go1/urdf/go1_unitree.urdf'
+        file = '{LEGGED_GYM_ROOT_DIR}/resources/robots/go2/urdf/go2_description.urdf'
         name = "go1"
         foot_name = "foot"
         penalize_contacts_on = ["thigh", "calf"]
         terminate_after_contacts_on = ["base","thigh", "calf","hip"]
         collapse_fixed_joints = True # merge bodies connected by fixed joints. Specific fixed joints can be kept by adding " <... dont_collapse="true">
         self_collisions = 0 # 1 to disable, 0 to enable...bitwise filter
-        flip_visual_attachments = False
+        flip_visual_attachments = True#False
         fix_base_link = False
 
         armature = 0.0
@@ -364,7 +365,7 @@ class Go1Cfg( LeggedRobotCfg ):
             # the ranges below:
 
             # This is the min/maximum ranges in the jump's distance curriculum (x_des = dx~pos_dx + x)
-            pos_dx_lim = [-0.0,0.0]
+            pos_dx_lim = [-1.,1.0]#[-0.0,0.0]
             pos_dy_lim = [-0.0,0.0]
             pos_dz_lim = [-0.0,0.0]
             # These are the starting ranges for the jump's distances (i.e. if curriculum 
@@ -443,7 +444,7 @@ class Go1CfgPPO( LeggedRobotCfgPPO ):
         # policy_class_name = 'ActorCriticRecurrent'
         # policy_class_name = 'ActorCritic'
         run_name = ''
-        experiment_name = 'test_go1'
+        experiment_name = 'go1_forward'
         num_steps_per_env = 24 # Try 30?
 
   
